@@ -24,19 +24,41 @@ app.post('/send-push', function (req, res) {
     var name = req.body.name;
     var message = req.body.message;
     var channel_ids = req.body.channel_ids;
-    console.log(channel_ids);
-    io.emit("notify everyone", {user: name, comment: message});
-    console.log('done sent')
+    
+    if(channel_ids.indexOf(',') > -1) {
+        var myarr = channel_ids.split(",");
+        myarr.forEach(function(entry) {
+            io.sockets.in(entry).emit("send message", {user: name, comment: message}); 
+        });
+    } else {
+        io.sockets.in(channel_ids).emit("send message", {user: name, comment: message});   
+    }
+           
+    console.log('done sent');
     res.sendStatus(200);
+    res.end('message sent');
+
 });
 
 app.use('/', router);
 
 io.on('connection', function (socket) {
     console.log('A user is connected with socket.io');
-    socket.on('comment added', function (data) {
-        io.emit("notify everyone", {user: data.user, comment: data.comment});
+    socket.on('subscribe', function(channel) { 
+        console.log('Joining channel', channel);
+        socket.join(channel); 
     });
+
+    socket.on('unsubscribe', function(channel) {  
+        console.log('Leaving channel', channel);
+        socket.leave(channel); 
+    });   
+    
+    socket.on('disconnect', function(channel) {  
+        console.log('socket disconnected', channel);
+        socket.leave(channel); 
+    });   
+    
 });
 
 

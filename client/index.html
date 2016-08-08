@@ -33,7 +33,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            var socket = io.connect('http://172.16.10.140:8080');
+            var socket = io.connect('http://172.16.10.140:8080', {'forceNew': true});
             
             $("#addComment").click(function (event) {
                 var userName = $("#name").val();
