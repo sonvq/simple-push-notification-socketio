@@ -24,14 +24,16 @@ app.post('/send-push', function (req, res) {
     var name = req.body.name;
     var message = req.body.message;
     var channel_ids = req.body.channel_ids;
+    var post_id = req.body.post_id;
+    var published_time = req.body.published_time;
     
     if(channel_ids.indexOf(',') > -1) {
         var myarr = channel_ids.split(",");
         myarr.forEach(function(entry) {
-            io.sockets.in(entry).emit("send message", {user: name, comment: message}); 
+            io.sockets.in(entry).emit("send message", {name: name, message: message, post_id: post_id, published_time: published_time}); 
         });
     } else {
-        io.sockets.in(channel_ids).emit("send message", {user: name, comment: message});   
+        io.sockets.in(channel_ids).emit("send message", {name: name, message: message, post_id: post_id, published_time: published_time});   
     }
            
     console.log('done sent');
